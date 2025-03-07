@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TipKit
 
 struct ContentView: View {
   @State var showExchangeInfo = false
@@ -14,8 +15,13 @@ struct ContentView: View {
   @State var leftAmount = ""
   @State var rightAmount = ""
   
+  @FocusState var leftTypingFocus: Bool
+  @FocusState var rightTypingFocus: Bool
+  
   @State var leftCurrency: Currency = .silverPiece
   @State var rightCurrency: Currency = .goldPiece
+  
+  let currencyTip = CurrencyTip()
   
   var body: some View {
     ZStack {
@@ -55,12 +61,14 @@ struct ContentView: View {
             .padding(.bottom, -5)
             .onTapGesture {
               showSelectCurrency.toggle()
+              currencyTip.invalidate(reason: .actionPerformed)
             }
-            
+            .popoverTip(currencyTip, arrowEdge: .bottom)
             
             // input de texto
             TextField("Amount", text: $leftAmount)
               .textFieldStyle(.roundedBorder)
+              .focused($leftTypingFocus)
           }
           // sinal de igual
           Image(systemName: "equal")
@@ -86,18 +94,20 @@ struct ContentView: View {
             .padding(.bottom, -5)
             .onTapGesture {
               showSelectCurrency.toggle()
+              currencyTip.invalidate(reason: .actionPerformed)
             }
             
             // input de texto
             TextField("Amount", text: $rightAmount)
               .textFieldStyle(.roundedBorder)
               .multilineTextAlignment(.trailing)
+              .focused($rightTypingFocus)
           }
         }
         .padding()
         .background(.black.opacity(0.5))
         .clipShape(.capsule)
-        
+        .keyboardType(.decimalPad)
         
         Spacer()
         
@@ -112,14 +122,33 @@ struct ContentView: View {
               .foregroundStyle(.white)
           }
           .padding(.trailing)
-          .sheet(isPresented: $showExchangeInfo) {
-            ExchangeInfo()
-          }
-          .sheet(isPresented: $showSelectCurrency) {
-            SelectCurrency(topCurrency: $leftCurrency, bottomCurrency: $rightCurrency)
-          }
         }
       }
+    }
+    .task {
+      try? Tips.configure()
+    }
+    .onChange(of: rightAmount) {
+      if rightTypingFocus {
+        leftAmount = rightCurrency.converter(rightAmount, to: leftCurrency)
+      }
+    }
+    .onChange(of: leftAmount) {
+      if leftTypingFocus {
+        rightAmount = leftCurrency.converter(leftAmount, to: rightCurrency)
+      }
+    }
+    .onChange(of: leftCurrency) {
+      leftAmount = rightCurrency.converter(rightAmount, to: leftCurrency)
+    }
+    .onChange(of: rightCurrency) {
+      rightAmount = leftCurrency.converter(leftAmount, to: rightCurrency)
+    }
+    .sheet(isPresented: $showExchangeInfo) {
+      ExchangeInfo()
+    }
+    .sheet(isPresented: $showSelectCurrency) {
+      SelectCurrency(topCurrency: $leftCurrency, bottomCurrency: $rightCurrency)
     }
   }
 }
