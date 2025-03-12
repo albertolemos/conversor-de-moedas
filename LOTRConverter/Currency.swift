@@ -1,36 +1,36 @@
-//
-//  Currency.swift
-//  LOTRConverter
-//
-//  Created by Alberto Lemos on 26/02/25.
-//
-
 import SwiftUI
 
-enum Currency: Double, CaseIterable, Identifiable {
-  case copperPenny = 6400
-  case silverPenny = 64
-  case silverPiece = 16
-  case goldPenny = 4
-  case goldPiece = 1
+enum Currency: String, CaseIterable, Identifiable {
+  case moedaLatao = "128000.0"
+  case copperPenny = "6400.0"
+  case silverPenny = "64.0"
+  case silverPiece = "16.0"
+  case goldPenny = "4.0"
+  case goldPiece = "1.0"
   
-  var id: Currency { self }
-
+  var id: String { rawValue }
+  
+  var doubleValue: Double {
+    return Double(rawValue) ?? 0.0
+  }
+  
   var image: ImageResource {
     switch self {
     case .copperPenny:
-      .copperpenny
+        .copperpenny
     case .silverPenny:
-      .silverpenny
+        .silverpenny
     case .silverPiece:
-      .silverpiece
+        .silverpiece
     case .goldPenny:
-      .goldpenny
+        .goldpenny
     case .goldPiece:
-      .goldpiece
+        .goldpiece
+    case .moedaLatao:
+        .copperpenny
     }
   }
-
+  
   var name: String {
     switch self {
     case .copperPenny:
@@ -43,6 +43,8 @@ enum Currency: Double, CaseIterable, Identifiable {
       "Gold Penny"
     case .goldPiece:
       "Gold Piece"
+    case .moedaLatao:
+      "Latão"
     }
   }
   
@@ -51,7 +53,7 @@ enum Currency: Double, CaseIterable, Identifiable {
       return ""
     }
     
-    let convertedAmount = DoubleAmount / self.rawValue * currency.rawValue
+    let convertedAmount = DoubleAmount / self.doubleValue * currency.doubleValue
     return String(format: "%.2f", convertedAmount)
   }
 }

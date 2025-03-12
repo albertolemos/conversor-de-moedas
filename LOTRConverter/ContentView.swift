@@ -18,8 +18,10 @@ struct ContentView: View {
   @FocusState var leftTypingFocus: Bool
   @FocusState var rightTypingFocus: Bool
   
-  @State var leftCurrency: Currency = .silverPiece
-  @State var rightCurrency: Currency = .goldPiece
+  @State var leftCurrency: Currency = UserDefaults.standard.string(forKey: "leftCurrency")
+    .flatMap(Currency.init(rawValue:)) ?? .silverPiece
+  @State var rightCurrency: Currency = UserDefaults.standard.string(forKey: "rightCurrency")
+    .flatMap(Currency.init(rawValue:)) ?? .goldPiece
   
   let currencyTip = CurrencyTip()
   
@@ -138,10 +140,12 @@ struct ContentView: View {
         rightAmount = leftCurrency.converter(leftAmount, to: rightCurrency)
       }
     }
-    .onChange(of: leftCurrency) {
+    .onChange(of: leftCurrency) { oldValue, newValue in
+      UserDefaults.standard.set(newValue.rawValue, forKey: "leftCurrency")
       leftAmount = rightCurrency.converter(rightAmount, to: leftCurrency)
     }
-    .onChange(of: rightCurrency) {
+    .onChange(of: rightCurrency) { oldValue, newValue in
+      UserDefaults.standard.set(newValue.rawValue, forKey: "rightCurrency")
       rightAmount = leftCurrency.converter(leftAmount, to: rightCurrency)
     }
     .sheet(isPresented: $showExchangeInfo) {
