@@ -37,6 +37,8 @@ struct ExchangeInfo: View {
           
           ExchangeRate(leftImage: .silverpenny, text: "1 Silver Penny = 100 Copper Pennies", rightImage: .copperpenny)
           
+          ExchangeRate(leftImage: .copperpenny, text: "1 Copper Penny = 200 Moedas de Latão", rightImage: .copperpenny)
+          
           // done button
           Button("Done") {
             dismiss()
