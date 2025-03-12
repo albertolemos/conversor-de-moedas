@@ -154,6 +154,10 @@ struct ContentView: View {
     .sheet(isPresented: $showSelectCurrency) {
       SelectCurrency(topCurrency: $leftCurrency, bottomCurrency: $rightCurrency)
     }
+    .onTapGesture {
+      leftTypingFocus = false
+      rightTypingFocus = false
+    }
   }
 }
 
